@@ -1,0 +1,63 @@
+SJF:
+#include<stdio.h>
+	struct process{
+		int id;
+		int at;
+		int bt;
+		int wt;
+		int tat;
+	};
+	void order_bt(struct process p[],int n){
+		struct process temp;
+		for(int i=0;i<n;i++){
+			for(int j=i+1;j<n;j++){
+				if(p[i].bt>p[j].bt){
+					temp=p[i];
+					p[i]=p[j];
+					p[j]=temp;
+				}
+			}
+		}	
+	}
+	void calculate_wt(struct process p[],int n){
+		p[0].wt=0;
+		for(int i=1;i<n;i++){
+			p[i].wt=p[i-1].bt+p[i-1].wt;
+		}
+	}
+	void calculate_tat(struct process p[],int n){
+		for(int i=0;i<n;i++){
+			p[i].tat=p[i].wt+p[i].bt;
+		}
+	}
+	 void calculate_avg(struct process p[],int n){
+	 	float totalwt=0,totaltat=0;
+	 	calculate_wt(p,n);
+	 	calculate_tat(p,n);
+	 	printf("Process\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time\n");
+	 	for(int i=0;i<n;i++){
+	 		totalwt+=p[i].wt;
+	 		totaltat+=p[i].tat;
+	 		printf("P%d\t%d\t\t%d\t\t%d\t\t%d\n", p[i].id, p[i].at, p[i].bt, p[i].wt,p[i].tat);
+	
+		 }
+		 printf("average wt:%.2f\n",totalwt);
+		 printf("average tat:%2.f\n",totaltat);
+	 }
+	 int main(){
+	 	int n;
+	 	printf("enter process");
+	 	scanf("%d",&n);
+	 	struct process p[n];
+	 	for(int i=0;i<n;i++){
+	 		p[i].id=i+1;
+	 		printf("Enter arrival time and burst time for%d",p[i].id);
+	 		scanf("%d %d",&p[i].at,&p[i].bt);
+	 }
+	order_bt(p, n);
+    calculate_avg(p, n);
+
+    return 0;
+    
+    
+   }
