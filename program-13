@@ -1,0 +1,71 @@
+LRU PAGING:
+#include <stdio.h>
+#include <stdlib.h>
+#define FRAME_SIZE 3
+int isPageInMemory(int page, int memory[], int frameSize) {
+    for (int i = 0; i < frameSize; i++) {
+        if (memory[i] == page) {
+            return 1;
+        }
+    }
+    return 0;
+}
+int findLRUPage(int memory[], int lastUsed[], int frameSize, int currentTime) {
+    int lruIndex = 0;
+    int minTime = currentTime;
+
+    for (int i = 0; i < frameSize; i++) {
+        if (lastUsed[i] < minTime) {
+            minTime = lastUsed[i];
+            lruIndex = i;
+        }
+    }
+    return lruIndex;
+}
+
+int main() {
+    int pages[100]; // Array to hold page references
+    int memory[FRAME_SIZE] = {-1, -1, -1};
+    int lastUsed[FRAME_SIZE] = {0};
+    int pageFaults = 0;
+    int numPages;
+
+    printf("Enter the number of pages: ");
+    scanf("%d", &numPages);
+
+    printf("Enter the page reference string (space-separated): ");
+    for (int i = 0; i < numPages; i++) {
+        scanf("%d", &pages[i]);
+    }
+
+    printf("Page Reference Sequence:\n");
+
+    for (int time = 0; time < numPages; time++) {
+        int currentPage = pages[time];
+
+        if (!isPageInMemory(currentPage, memory, FRAME_SIZE)) {
+            pageFaults++;
+            int lruIndex = findLRUPage(memory, lastUsed, FRAME_SIZE, time);
+            memory[lruIndex] = currentPage;
+            lastUsed[lruIndex] = time;
+        } else {
+            for (int i = 0; i < FRAME_SIZE; i++) {
+                if (memory[i] == currentPage) {
+                    lastUsed[i] = time;
+                    break;
+                }
+            }
+        }
+
+        printf("Time %d: ", time);
+        for (int i = 0; i < FRAME_SIZE; i++) {
+            if (memory[i] != -1) {
+                printf("%d ", memory[i]);
+            }
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults: %d\n", pageFaults);
+    return 0;
+}
