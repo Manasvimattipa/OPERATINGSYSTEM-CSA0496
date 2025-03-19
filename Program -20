@@ -1,0 +1,128 @@
+Two level directory structures 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#define MAX_DIRS 5
+#define MAX_FILES 10
+#define MAX_FILENAME_LENGTH 50
+#define MAX_DIRNAME_LENGTH 50
+struct File {
+    char name[MAX_FILENAME_LENGTH];};
+struct Directory {
+    char name[MAX_DIRNAME_LENGTH];
+    struct File files[MAX_FILES];
+    int fileCount;};
+struct FileSystem {
+    struct Directory directories[MAX_DIRS];
+    int dirCount;};
+void createDirectory(struct FileSystem *fs, const char *dirname) {
+    if (fs->dirCount < MAX_DIRS) {
+        strcpy(fs->directories[fs->dirCount].name, dirname);
+        fs->directories[fs->dirCount].fileCount = 0;
+        fs->dirCount++;
+        printf("Directory '%s' created.\n", dirname);
+    } else {
+        printf("Maximum number of directories reached.\n");
+    }
+}
+
+void createFile(struct FileSystem *fs, const char *dirname, const char *filename) {
+    for (int i = 0; i < fs->dirCount; i++) {
+        if (strcmp(fs->directories[i].name, dirname) == 0) {
+            if (fs->directories[i].fileCount < MAX_FILES) {
+                strcpy(fs->directories[i].files[fs->directories[i].fileCount].name, filename);
+                fs->directories[i].fileCount++;
+                printf("File '%s' created in directory '%s'.\n", filename, dirname);
+            } else {
+                printf("Directory '%s' is full. Cannot create more files.\n", dirname);
+            }
+            return;
+        }
+    }
+    printf("Directory '%s' not found.\n", dirname);
+}
+
+void listFiles(struct FileSystem *fs, const char *dirname) {
+    for (int i = 0; i < fs->dirCount; i++) {
+        if (strcmp(fs->directories[i].name, dirname) == 0) {
+            if (fs->directories[i].fileCount == 0) {
+                printf("No files in directory '%s'.\n", dirname);
+            } else {
+                printf("Files in directory '%s':\n", dirname);
+                for (int j = 0; j < fs->directories[i].fileCount; j++) {
+                    printf("%s\n", fs->directories[i].files[j].name);
+                }
+            }
+            return;
+        }
+    }
+    printf("Directory '%s' not found.\n", dirname);
+}
+
+void deleteFile(struct FileSystem *fs, const char *dirname, const char *filename) {
+    for (int i = 0; i < fs->dirCount; i++) {
+        if (strcmp(fs->directories[i].name, dirname) == 0) {
+            for (int j = 0; j < fs->directories[i].fileCount; j++) {
+                if (strcmp(fs->directories[i].files[j].name, filename) == 0) {
+                    for (int k = j; k < fs->directories[i].fileCount - 1; k++) {
+                        fs->directories[i].files[k] = fs->directories[i].files[k + 1];
+                    }
+                    fs->directories[i].fileCount--;
+                    printf("File '%s' deleted from directory '%s'.\n", filename, dirname);
+                    return;
+                }
+            }
+            printf("File '%s' not found in directory '%s'.\n", filename, dirname);
+            return;
+        }
+    }
+    printf("Directory '%s' not found.\n", dirname);
+}
+
+int main() {
+    struct FileSystem fs;
+    fs.dirCount = 0;
+
+    int choice;
+    char dirname[MAX_DIRNAME_LENGTH];
+    char filename[MAX_FILENAME_LENGTH];
+
+    while (1) {
+        printf("\n1. Create Directory\n2. Create File\n3. List Files\n4. Delete File\n5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                createDirectory(&fs, dirname);
+                break;
+            case 2:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                printf("Enter filename: ");
+                scanf("%s", filename);
+                createFile(&fs, dirname, filename);
+                break;
+            case 3:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                listFiles(&fs, dirname);
+                break;
+            case 4:
+                printf("Enter directory name: ");
+                scanf("%s", dirname);
+                printf("Enter filename to delete: ");
+                scanf("%s", filename);
+                deleteFile(&fs, dirname, filename);
+                break;
+            case 5:
+                return 0;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
