@@ -1,0 +1,56 @@
+FIRST FIT
+#include <stdio.h>
+#define MAX_BLOCKS 10
+#define MAX_PROCESSES 7
+struct Block {
+    int size;
+    int isFree;
+};
+struct Process {
+    int id;
+    int size;
+};
+void firstFit(struct Block blocks[], int blockCount, struct Process processes[], int processCount) {
+    for (int i = 0; i < processCount; i++) {
+        int j;
+        for (j = 0; j < blockCount; j++) {
+            if (blocks[j].isFree && blocks[j].size >= processes[i].size) {
+                blocks[j].isFree = 0;
+                printf("Process %d (Size: %d) allocated to Block %d (Size: %d)\n", 
+                       processes[i].id, processes[i].size, j, blocks[j].size);
+                break;
+            }
+        }
+        if (j == blockCount) {
+            printf("Process %d (Size: %d) could not be allocated\n", processes[i].id, processes[i].size);
+        }
+    }
+}
+int main() {
+    struct Block blocks[MAX_BLOCKS] = {
+        {100, 1},
+        {500, 1},
+        {200, 1},
+        {300, 1},
+        {600, 1},
+        {400, 1},
+        {250, 1},
+        {700, 1},
+        {800, 1},
+        {1200, 1}
+    };
+
+    struct Process processes[MAX_PROCESSES] = {
+        {1, 212},
+        {2, 417},
+        {3, 112},
+        {4, 426},
+        {5, 300},
+        {6, 150},
+        {7, 800}
+    };
+
+    firstFit(blocks, MAX_BLOCKS, processes, MAX_PROCESSES);
+
+    return 0;
+}
