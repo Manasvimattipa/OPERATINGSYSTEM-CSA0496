@@ -1,0 +1,84 @@
+SCAN DISK SCHEDULING
+#include <stdio.h>
+#include <stdlib.h>
+void sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+void findSeekTime(int arr[], int n, int head, int direction) {
+    int seekTime = 0;
+    int distance, curTrack;
+    int size = 200;
+
+    sort(arr, n);
+
+    int index;
+    for (index = 0; index < n; index++) {
+        if (arr[index] >= head) {
+            break;
+        }
+    }
+
+    if (direction == 0) {
+        for (int i = index - 1; i >= 0; i--) {
+            curTrack = arr[i];
+            distance = curTrack - head;
+            if (distance < 0) distance = -distance;
+            seekTime += distance;
+            head = curTrack;
+        }
+        seekTime += head;
+        head = 0;
+        seekTime += head;
+        for (int i = 0; i < index; i++) {
+            curTrack = arr[i];
+            distance = curTrack - head;
+            if (distance < 0) distance = -distance;
+            seekTime += distance;
+            head = curTrack;
+        }
+    } else {
+        for (int i = index; i < n; i++) {
+            curTrack = arr[i];
+            distance = curTrack - head;
+            if (distance < 0) distance = -distance;
+            seekTime += distance;
+            head = curTrack;
+        }
+        seekTime += (size - 1 - head);
+        head = size - 1;
+        for (int i = n - 1; i >= index; i--) {
+            curTrack = arr[i];
+            distance = curTrack - head;
+            if (distance < 0) distance = -distance;
+            seekTime += distance;
+            head = curTrack;
+        }
+    }
+
+    printf("Total Seek Time: %d\n", seekTime);
+}
+
+int main() {
+    int arr[] = {45, 10, 150, 75, 30, 90, 120, 60};
+    int head = 50;
+    int direction = 1;
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Disk Requests: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\nInitial Head Position: %d\n", head);
+
+    findSeekTime(arr, n, head, direction);
+
+    return 0;
+}
